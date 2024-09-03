@@ -7,19 +7,16 @@ function generateCode() {
 
 async function generate(junior, senior) {
     let code;
-
     while (true) {
         code = generateCode();
         const existing = await Invitation.findOne({ code });
         if (!existing) break;
     }
-
     const invitation = new Invitation({
         junior,
         senior,
         code,
     });
-
     await invitation.save();
     return code;
 }
@@ -35,4 +32,15 @@ async function verify(code) {
     return null;
 }
 
-module.exports = { generate, verify };
+async function remove(code, senior) {
+    const invitation = await Invitation.findOne({ code });
+    if (!invitation) {
+        return null;
+    }
+    if (invitation.senior != senior) {
+        return false;
+    }
+    return true;
+}
+
+module.exports = { generate, verify, remove };

@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { generate, verify } = require('./service/service');
+const { generate, verify, remove } = require('./service/service');
 
 const app = express();
 app.use(bodyParser.json());
@@ -28,6 +28,18 @@ app.post('/api/verify', async (req, res) => {
         });
     } else {
         res.status(400).json({ detail: 'Verification Failed' });
+    }
+});
+
+app.post('api/delete', async (req, res) => {
+    const { code, senior } = req.body;
+    const response = await remove(code, senior);
+    if (response === null) {
+        res.status(404).json({ detail: 'Invalid Code' });
+    } else if (response === false) {
+        res.status(400).json({ detail: 'Verification Failed' });
+    } else if (response === true) {
+        res.status(200);
     }
 });
 
